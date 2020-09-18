@@ -13,11 +13,19 @@ class Transaction {
     @required this.date,
   });
 
-  Transaction.t2({
+  Transaction.c2({
     @required this.title,
     @required this.amount,
   }){
     this.id=DateTime.now().toString();
     this.date=DateTime.now();
+  }
+
+  Transaction.c3({
+    @required this.title,
+    @required this.amount,
+    @required this.date,
+  }){
+    this.id=DateTime.now().toString();
   }
 }
