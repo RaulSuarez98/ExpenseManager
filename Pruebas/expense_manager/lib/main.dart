@@ -1,10 +1,17 @@
-import './widgets/new_transaction.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+
+import './widgets/new_transaction.dart';
 import './widgets/transaction_list.dart';
 import './models/transaction.dart';
 import './widgets/chart.dart';
 
 void main() {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // SystemChrome.setPreferredOrientations([
+  //   DeviceOrientation.portraitUp,
+  //   DeviceOrientation.portraitDown,
+  // ]);
   runApp(MyApp());
 }
 
@@ -19,13 +26,12 @@ class MyApp extends StatelessWidget {
         errorColor: Colors.red,
         fontFamily: 'Quicksand',
         textTheme: ThemeData.light().textTheme.copyWith(
-              headline6: TextStyle(
-                fontFamily: 'OpenSans',
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-          button:  TextStyle(color: Colors.indigo)
+            headline6: TextStyle(
+              fontFamily: 'OpenSans',
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
             ),
+            button: TextStyle(color: Colors.indigo)),
         appBarTheme: AppBarTheme(
           textTheme: ThemeData.light().textTheme.copyWith(
                 headline6: TextStyle(
@@ -64,6 +70,8 @@ class _MyHomePageState extends State<MyHomePage> {
     // )
   ];
 
+  bool _showChart = false;
+
   List<Transaction> get _recentTransactions {
     return _userTransaction.where((tx) {
       return tx.date.isAfter(
@@ -74,7 +82,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }).toList();
   }
 
-  void _addNewTransaction(String txTitle, double txAmount, DateTime chosenDate) {
+  void _addNewTransaction(
+      String txTitle, double txAmount, DateTime chosenDate) {
     final newText = Transaction.c3(
       title: txTitle,
       amount: txAmount,
@@ -95,31 +104,61 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _deleteTransaction(String id){
+  void _deleteTransaction(String id) {
     setState(() {
-      _userTransaction.removeWhere((tx) => tx.id ==id);
+      _userTransaction.removeWhere((tx) => tx.id == id);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final appBar = AppBar(
+      title: Text('My Personal Expenses'),
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () => _startAddNewTransaction(context),
+        )
+      ],
+    );
+
+    double _sizeClaculator() {
+      double sizeTotal = MediaQuery.of(context).size.height -
+          appBar.preferredSize.height -
+          MediaQuery.of(context).padding.top;
+      return sizeTotal;
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('My Personal Expenses'),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => _startAddNewTransaction(context),
-          )
-        ],
-      ),
+      appBar: appBar,
       body: SingleChildScrollView(
         child: Column(
           // mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Chart(_recentTransactions),
-            TransactionList(_userTransaction,_deleteTransaction),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text('Show Chart'),
+                Switch(
+                  value: _showChart,
+                  onChanged: (val) {
+                    setState(() {
+                      _showChart = val;
+                    });
+                  },
+                )
+              ],
+            ),
+            _showChart
+                ? Container(
+                    height: _sizeClaculator() * 0.3,
+                    child: Chart(_recentTransactions),
+                  )
+                : Container(
+                    height: _sizeClaculator() * 0.7,
+                    child:
+                        TransactionList(_userTransaction, _deleteTransaction)),
           ],
         ),
       ),

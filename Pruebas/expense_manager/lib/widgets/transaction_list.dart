@@ -11,10 +11,8 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 450,
-      child: transactions.isEmpty
-          ? Column(
+    return transactions.isEmpty
+          ? LayoutBuilder(builder: ,)Column(
               children: <Widget>[
                 Text(
                   'No transactions added yet',
@@ -60,13 +58,15 @@ class TransactionList extends StatelessWidget {
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
                       color: Theme.of(context).errorColor,
-                      onPressed: () =>deleteTx(transactions[index].id,),
+                      onPressed: () => deleteTx(
+                        transactions[index].id,
+                      ),
                     ),
                   ),
                 );
               },
               itemCount: transactions.length,
-            ),
+
     );
   }
 }
